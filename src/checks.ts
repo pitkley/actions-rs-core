@@ -28,11 +28,16 @@ export class CheckReporter {
     ): Promise<number> {
         const { owner, repo } = github.context.repo;
 
+        let sha = github.context.sha;
+        if (github.context.payload.pull_request?.head?.sha) {
+            sha = github.context.payload.pull_request.head.sha;
+        }
+
         const response = await this.client.checks.create({
             owner: owner,
             repo: repo,
             name: this.checkName,
-            head_sha: github.context.sha, // eslint-disable-line
+            head_sha: sha, // eslint-disable-line
             status: status ? status : 'in_progress',
         });
         // TODO: Check for errors
